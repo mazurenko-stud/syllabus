@@ -1,0 +1,209 @@
+@startuml
+title Діаграма класів системи Syllabus.uno
+
+!pragma layout smetana
+left to right direction
+
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 45
+skinparam ranksep 45
+skinparam wrapWidth 160
+skinparam maxMessageSize 160
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #333333
+    ArrowColor #333333
+    FontSize 10
+}
+
+class "Користувач" as User {
+    +id: UUID
+    +email: String
+    +повнеІмя: String
+    +роль: String
+    +активний: Boolean
+    --
+    +увійти(email: String, пароль: String): Boolean
+    +вийти(): void
+    +перевіритиДоступ(дія: String): Boolean
+    +оновитиПрофіль(дані: Map): void
+    +отриматиРоль(): String
+}
+
+class "Кафедра" as Department {
+    +departmentId: UUID
+    +назва: String
+    +скороченаНазва: String
+    +відповідальнийEmail: String
+    +активна: Boolean
+    --
+    +створитиОсвітнюПрограму(назва: String): EducationalProgram
+    +редагуватиОсвітнюПрограму(id: UUID): void
+    +переглянутиПрограми(): List
+    +призначитиВідповідального(userId: UUID): void
+    +деактивуватиКафедру(): void
+}
+
+class "ОсвітняПрограма" as EducationalProgram {
+    +programId: UUID
+    +назва: String
+    +кодСпеціальності: String
+    +освітнійРівень: String
+    +рікВступу: Int
+    --
+    +додатиДисципліну(id: UUID): void
+    +видалитиДисципліну(id: UUID): void
+    +оновитиОпис(опис: String): void
+    +отриматиДисципліни(): List
+    +перевіритиПовноту(): Boolean
+}
+
+class "Дисципліна" as Discipline {
+    +disciplineId: UUID
+    +назва: String
+    +кількістьКредитів: Float
+    +семестр: Int
+    +формаКонтролю: String
+    --
+    +оновитиНазву(назва: String): void
+    +задатиКредити(кредити: Float): void
+    +задатиСеместр(семестр: Int): void
+    +отриматиСилабус(): Syllabus
+    +отриматиРобочуПрограму(): WorkProgram
+}
+
+abstract class "НавчальнийДокумент" as AcademicDocument {
+    +documentId: UUID
+    +назва: String
+    +типДокумента: String
+    +навчальнийРік: String
+    +статус: String
+    --
+    +створити(): void
+    +редагувати(): void
+    +перевіритиПоля(): Boolean
+    +змінитиСтатус(статус: String): void
+    +згенерувати(): GeneratedDocument
+}
+
+class "Силабус" as Syllabus {
+    +syllabusId: UUID
+    +метаКурсу: String
+    +політикаКурсу: String
+    +критеріїОцінювання: String
+    +література: String
+    --
+    +заповнитиМету(текст: String): void
+    +оновитиПолітику(текст: String): void
+    +оновитиОцінювання(текст: String): void
+    +додатиЛітературу(джерело: String): void
+    +сформуватиСилабус(): GeneratedDocument
+}
+
+class "РобочаПрограма" as WorkProgram {
+    +workProgramId: UUID
+    +описДисципліни: String
+    +темиЗанять: String
+    +методиНавчання: String
+    +контрольніЗаходи: String
+    --
+    +заповнитиОпис(текст: String): void
+    +додатиТему(тема: String): void
+    +оновитиМетоди(текст: String): void
+    +додатиКонтрольнийЗахід(захід: String): void
+    +сформуватиРобочуПрограму(): GeneratedDocument
+}
+
+class "ШаблонДокумента" as DocumentTemplate {
+    +templateId: UUID
+    +назва: String
+    +типДокумента: String
+    +версіяШаблону: String
+    +шляхДоФайлу: String
+    --
+    +завантажитиШаблон(): File
+    +перевіритиСтруктуру(): Boolean
+    +оновитиШаблон(file: File): void
+    +застосуватиДоДокумента(id: UUID): GeneratedDocument
+    +деактивуватиШаблон(): void
+}
+
+class "ВерсіяДокумента" as DocumentVersion {
+    +versionId: UUID
+    +номерВерсії: Int
+    +датаСтворення: DateTime
+    +авторId: UUID
+    +коментар: String
+    --
+    +створитиВерсію(): void
+    +відновитиВерсію(): AcademicDocument
+    +позначитиАктуальною(): void
+    +порівнятиЗ(versionId: UUID): String
+    +отриматиІсторію(): List
+}
+
+class "ЗгенерованийДокумент" as GeneratedDocument {
+    +fileId: UUID
+    +назваФайлу: String
+    +формат: String
+    +розмірФайлу: Long
+    +шлях: String
+    --
+    +створитиФайл(): File
+    +перевіритиФормат(): Boolean
+    +зберегтиЛокально(): File
+    +підготуватиДоПублікації(): Boolean
+    +отриматиПосилання(): String
+}
+
+class "РепозиторійДокументів" as Repository {
+    +repositoryId: UUID
+    +назва: String
+    +baseUrl: String
+    +кількістьДокументів: Int
+    +активний: Boolean
+    --
+    +завантажитиДокумент(file: GeneratedDocument): Boolean
+    +знайтиДокумент(запит: String): List
+    +опублікуватиДокумент(id: UUID): void
+    +архівуватиДокумент(id: UUID): void
+    +отриматиПублічнеПосилання(id: UUID): String
+}
+
+Syllabus --|> AcademicDocument
+WorkProgram --|> AcademicDocument
+
+User --> Department : належить/керує
+User --> EducationalProgram : обирає
+User --> AcademicDocument : створює
+Department --> EducationalProgram : створює
+
+Department "1" o-- "0..*" User : користувачі
+EducationalProgram "1" o-- "1..*" Discipline : дисципліни
+Repository "1" o-- "0..*" GeneratedDocument : файли
+
+Discipline "1" *-- "0..*" Syllabus : силабуси
+Discipline "1" *-- "0..*" WorkProgram : робочі програми
+AcademicDocument "1" *-- "1..*" DocumentVersion : версії
+DocumentVersion "1" *-- "0..1" GeneratedDocument : файл
+
+DocumentTemplate ..> Syllabus : <<instantiate>>
+DocumentTemplate ..> WorkProgram : <<instantiate>>
+
+AcademicDocument --> DocumentTemplate : шаблон
+GeneratedDocument --> Repository : зберігається в
+
+User -[hidden]right- Department
+Department -[hidden]right- EducationalProgram
+EducationalProgram -[hidden]right- Discipline
+Discipline -[hidden]right- AcademicDocument
+AcademicDocument -[hidden]right- DocumentTemplate
+AcademicDocument -[hidden]down- Syllabus
+Syllabus -[hidden]right- WorkProgram
+WorkProgram -[hidden]right- DocumentVersion
+DocumentVersion -[hidden]right- GeneratedDocument
+GeneratedDocument -[hidden]right- Repository
+@enduml
