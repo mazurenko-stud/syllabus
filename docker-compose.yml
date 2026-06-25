@@ -1,0 +1,27 @@
+services:
+  document-service-11:
+    container_name: document-service-11
+    build: ./document_service
+    ports:
+      - "8011:8000"
+    environment:
+      - STUDENT_N=11
+    networks:
+      - lab6-network
+
+  repository-service-11:
+    container_name: repository-service-11
+    build: ./repository_service
+    ports:
+      - "9011:8000"
+    environment:
+      - STUDENT_N=11
+      - DOCUMENT_SERVICE_URL=http://document-service-11:8000
+    depends_on:
+      - document-service-11
+    networks:
+      - lab6-network
+
+networks:
+  lab6-network:
+    driver: bridge

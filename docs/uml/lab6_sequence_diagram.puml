@@ -1,0 +1,28 @@
+@startuml
+title Sequence Diagram: publication of a document in Syllabus.uno
+
+actor "Postman Client" as Client
+participant "Repository Service\nport 9011" as Repository
+participant "Document Service\nport 8011" as Document
+database "In-memory data stores\nstudent_id = 11" as DB
+
+Client -> Repository: POST /repository/publish\n{document_id: 1101}
+activate Repository
+Repository -> Document: GET /documents/1101
+activate Document
+Document -> DB: find document by id = 1101
+DB --> Document: document data
+Document --> Repository: 200 OK\n{student_id: 11, document: {...}}
+deactivate Document
+Repository -> DB: create repository record
+DB --> Repository: saved record
+Repository --> Client: 200 OK\n{student_id: 11, record: {...}}
+deactivate Repository
+
+Client -> Repository: GET /repository/records
+activate Repository
+Repository -> DB: get all repository records
+DB --> Repository: records list
+Repository --> Client: 200 OK\n{student_id: 11, records: [...]}
+deactivate Repository
+@enduml
