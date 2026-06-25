@@ -1,0 +1,12 @@
+﻿services:
+  used-cars-marketplace:
+    build: .
+    container_name: used-cars-marketplace-11
+    ports:
+      - "${APP_PORT}:8011"
+    environment:
+      APP_ENV: ${APP_ENV}
+      STUDENT_ID: ${STUDENT_ID}
+      SERVICE_NAME: ${SERVICE_NAME}
+      DEFAULT_CURRENCY: ${DEFAULT_CURRENCY}
+    restart: unless-stopped
