@@ -1,0 +1,111 @@
+{
+  "info": {
+    "name": "Lab6_Microservices_Syllabus_uno",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get document 1101",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8011/documents/1101",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8011",
+          "path": [
+            "documents",
+            "1101"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('student_id is 11', function () { var j = pm.response.json(); pm.expect(j.student_id).to.eql(11); });",
+              "pm.test('document id is 1101', function () { var j = pm.response.json(); pm.expect(j.document.id).to.eql(1101); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Publish document 1101",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"document_id\": 1101,\n  \"visibility\": \"public\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:9011/repository/publish",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "9011",
+          "path": [
+            "repository",
+            "publish"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('student_id is 11', function () { var j = pm.response.json(); pm.expect(j.student_id).to.eql(11); });",
+              "pm.test('published document 1101', function () { var j = pm.response.json(); pm.expect(j.record.document_id).to.eql(1101); pm.expect(j.record.status).to.eql('published'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get repository records",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:9011/repository/records",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "9011",
+          "path": [
+            "repository",
+            "records"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('student_id is 11', function () { var j = pm.response.json(); pm.expect(j.student_id).to.eql(11); });",
+              "pm.test('records exist', function () { var j = pm.response.json(); pm.expect(j.count).to.be.above(0); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
