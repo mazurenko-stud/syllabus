@@ -1,0 +1,61 @@
+﻿@startuml
+title Варiант 11. Маркетплейс вживаних авто. Дiаграма класiв
+
+class Seller {
+  +seller_id: int
+  +name: string
+  +phone: string
+  +rating: float
+  +createListing()
+  +confirmTestDrive()
+}
+
+class Buyer {
+  +buyer_id: int
+  +name: string
+  +phone: string
+  +requestTestDrive()
+  +sendMessage()
+}
+
+class CarListing {
+  +listing_id: int
+  +title: string
+  +price: decimal
+  +currency: string
+  +status: string
+  +publish()
+  +archive()
+}
+
+class Car {
+  +car_id: int
+  +brand: string
+  +model: string
+  +year: int
+  +vin: string
+  +mileage: int
+}
+
+class TestDrive {
+  +test_drive_id: int
+  +preferred_date: date
+  +status: string
+  +createRequest()
+  +changeStatus()
+}
+
+class Photo {
+  +photo_id: int
+  +url: string
+  +sort_order: int
+}
+
+Seller "1" -- "0..*" CarListing : створює
+CarListing "1" -- "1" Car : описує
+CarListing "1" -- "0..*" Photo : мiстить
+Buyer "1" -- "0..*" TestDrive : замовляє
+CarListing "1" -- "0..*" TestDrive : має заявки
+Seller "1" -- "0..*" TestDrive : пiдтверджує
+
+@enduml
